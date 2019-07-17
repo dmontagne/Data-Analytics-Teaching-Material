@@ -1,8 +1,9 @@
 ---
-title: "Data Analytics for Business <br> Day 1, Part 2: <br> R Basics"
-author: "Brian Aronson"
-date: "August 27, 2018"
+title: 'Data Analytics for Business <br> Day 1, Part 2: <br> R Basics'
 output:
+  pdf_document:
+    toc: yes
+    toc_depth: '5'
   html_document:
     toc: yes
     toc_depth: 5
