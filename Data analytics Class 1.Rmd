@@ -2,7 +2,10 @@
 title: "Data Analytics for Business <br> Day 1, Part 2: <br> R Basics"
 author: "Brian Aronson"
 date: "August 27, 2018"
-output: ioslides_presentation
+output:
+  html_document:
+    toc: yes
+    toc_depth: 5
 ---
 
 ```{r setup, include=FALSE}
@@ -32,7 +35,7 @@ Mac users, update XQuartz at: https://www.xquartz.org/
 
 
 ## Familiarizing yourself with R
-![](~/Desktop/Data_analytics_Class_R files/images/r_session.png)
+![](images/r_session.png)
 
 
 ## Some notes:
@@ -51,7 +54,7 @@ getwd()
 ## Setting a work directory
 On Apple:
 
-![](~/Desktop/Data_analytics_Class_R files/images/set_wd.png)
+![](images/set_wd.png)
 
 ## Setting a work directory
 When I paste this info into R. At first, I get:
@@ -65,8 +68,7 @@ setwd("~/Desktop/Data Analytics for Business/data")
 ```
 
 ```{r, include=FALSE}
-knitr::opts_knit$set(root.dir = "~/Desktop/Data_analytics_Class_R files")
-getwd()
+knitr::opts_knit$set(root.dir = "~/Documents/GitHub/Data-Analytics-Teaching-Material")
 ```
 
 
@@ -220,7 +222,7 @@ table(scf$race)
 ## Making new variables
 What do these categories mean? As you go along in this class (and possibly as future data analysts), you will need to reference your data's codebook:
 
-![](/Users/dmontagne/Desktop/Data_analytics_Class_R files/images/codebook_ex.png)
+![](images/codebook_ex.png)
 
 ## Making new variables
 Let's make a new variable for whether someone is white with the *ifelse* function.
@@ -242,7 +244,7 @@ table(scf$race2)
 
 ## When closing RStudio, save changes to your code, but not to the data!
 
-![](C:/Users/bda13/Desktop/Data Analytics for Business/Class 1/dont save.png)
+![](images/dont_save_image.png) 
 
 
 ## Due next week
