@@ -1,0 +1,356 @@
+<style>
+
+
+.reveal section p {
+  color: black;
+  font-size: .7em;
+  font-family: 'Helvetica'; #this is the font/color of text in slides
+}
+
+
+.section .reveal .state-background {
+    background: white;}
+.section .reveal h1,
+.section .reveal p {
+    color: black;
+    position: relative;
+    top: 4%;}
+
+
+.wrap-url pre code {
+  word-wrap:break-word;
+}
+
+</style>
+
+
+Basic Statistics in R
+========================================================
+autosize: true
+transition: fade
+  github: https://github.com/dmontagne
+  
+Agenda:
+========================================================
+- Weighted medians and standard deviations
+- Operations
+- Subsetting variables
+- Missing Values
+- Bivariate statistics
+
+
+Install Packages
+========================================================
+We are going to need two more packages for class
+
+```{r, eval=F}
+  install.packages("Hmisc")
+  install.packages("tidyverse")
+  install.packages("ggplot2")
+```
+
+```{r, include=FALSE}
+knitr::opts_knit$set(root.dir = "~/Documents/GitHub/Data-Analytics-Teaching-Material/")
+```
+
+  
+Prepare R Session
+========================================================
+- First, remember to set your working directory. This line of code will need to be edited to be specific to the path you use on your computer
+- Load our necessary libraries
+- Read our data into R
+- Clean variable names (make lower case)
+- Create any convenient functions we will need for analysis
+
+Prepare R Session
+========================================================
+- Set working directory
+```{r, eval=F}
+#EDIT
+   setwd("C:/Users/bda13/Desktop/Data Analytics for Business/scf2016") 
+```
+
+Prepare R Session
+========================================================
+- Load libraries
+```{r, eval=F}
+    library(haven)
+    library(tidyverse)
+    library(Hmisc)
+    library(ggplot2)
+```
+
+Prepare R Session
+========================================================
+- Read in and prep data
+```{r, eval = F}
+# read data
+    scf <- read_dta("rscfp2016.dta")
+# lower case variable names
+    names(scf)<-tolower(names(scf))
+```
+
+```{r, eval=T, include=F}
+# libraries
+    library(haven)
+    library(tidyverse)
+    library(Hmisc)
+    library(ggplot2)
+# read data
+ scf <- read_dta("rscfp2016.dta")
+# lower case variable names
+    names(scf)<-tolower(names(scf))
+```
+
+Prepare Data
+========================================================
+`Hmisc` does not include weighted medians or weighted sds, but it includes functions that we can easily convert to fit our needs
+
+```{r, eval=T}
+# create convenient functions
+    weighted.median<-function(var,weight) {as.numeric(wtd.quantile(var, weight,.5))}
+    weighted.sd<-function(var,weight) {sqrt(wtd.var(var,weight))}
+```
+
+Weighted Means
+========================================================
+Lets look at the variable `mma`. First, we need to know what this variable means...
+
+Then, lets compare the unweighted and weighted means
+```{r, eval=T}
+mean(scf$mma)
+weighted.mean(scf$mma,scf$wgt)
+```
+
+Weighted Standard Deviations
+========================================================
+```{r, eval=T}
+sd(scf$mma)
+weighted.sd(scf$mma,scf$wgt)
+```
+
+Weighted Median
+========================================================
+```{r, eval=T}
+median(scf$mma)
+weighted.median(scf$mma,scf$wgt)
+summary(scf$mma)
+```
+
+Weighted Median
+========================================================
+What if we want to know info just about people who own money market accounts?
+
+Operations/Logical Variables
+========================================================
+```{r, eval=T}
+head(scf$mma)
+head(scf$mma==0)
+head(scf$mma!=0)
+head(scf$mma>0)
+head(scf$mma>=0)
+```
+
+Subsetting
+========================================================
+```{r, eval=T}
+scf$mma[scf$mma!=0]
+```
+
+Subsetting
+========================================================
+```{r, eval=T}
+head(scf$mma[scf$mma!=0])
+```
+
+Subsetting
+========================================================
+
+```{r}
+money_market_account_only <- scf %>% 
+  filter(mma != 0)
+```
+
+Subsetted Statistics
+========================================================
+```{r, eval=T}
+summary(money_market_account_only$mma)
+median(money_market_account_only$mma)
+weighted.median(money_market_account_only$mma,money_market_account_only$wgt)
+```
+
+
+Review - Tables and SDA
+========================================================
+```{r, eval=T}
+table(scf$edcl)
+```
+
+Review - Tables and SDA
+========================================================
+![](images/variable_lookup.png)
+
+
+Back to Data Prep
+========================================================
+- you will go back to data prep innumerable times
+
+Back to Data Prep
+========================================================
+```{r, eval=T}
+scf$edcl<-round(scf$edcl)
+table(scf$edcl)
+```
+
+Creating New Variables
+========================================================
+ifelse syntax:
+
+`ifelse("if this condition is met", "then do this", "else, do this")`
+
+```{r, eval=T}
+scf <- scf %>% 
+  mutate(married.gender = ifelse(married == 1 & hhsex == 1, "Married Men",
+                          ifelse(married == 1 & hhsex == 2, "Married Women",  
+                          ifelse(scf$married==0 & scf$hhsex==1, "Single Men", "Single Women"))))
+
+table(scf$married.gender) # No married men?
+```
+
+Creating New Variables
+========================================================
+Subsetting Syntax
+```{r, eval=T}
+scf$education<-scf$edcl
+scf$education[scf$education==1]<-"Less Than HS"
+scf$education[scf$education==2]<-"High School"
+scf$education[scf$education==3]<-"Some College"
+scf$education[scf$education==4]<-"College"
+table(scf$education)
+```
+
+Married/Gender by Education
+========================================================
+```{r, eval=T}
+table(scf$education,scf$married.gender)
+prop.table(table(scf$education,scf$married.gender),2)
+```
+
+Wealth By Race?
+========================================================
+```{r, eval=T}
+weighted.median(scf$networth,scf$wgt)
+weighted.median(scf$networth[scf$race==1],scf$wgt[scf$race==1])
+weighted.median(scf$networth[scf$race==2],scf$wgt[scf$race==2])
+```
+
+Correlation of Wealth and Income
+========================================================
+```{r, eval=T}
+cor(scf$networth,scf$income)
+```
+
+Graphing Wealth and Income
+========================================================
+```{r, eval=F}
+ggplot(data=scf,aes(x=income,y=networth))+
+    geom_smooth()
+```
+
+Graphing Wealth and Income
+========================================================
+```{r, eval=T,echo=F}
+ggplot(data=scf,aes(x=income,y=networth))+
+    geom_smooth()
+```
+
+Example: Number Kids and Number Vehicles
+========================================================
+```{r, eval=T}
+scf$kids<-round(scf$kids)
+scf$nvehic<-round(scf$nvehic)
+table(scf$kids)
+table(scf$nvehic)
+```
+
+Tables of number Kids and vehicles
+========================================================
+```{r, eval=T}
+table(scf$kids,scf$nvehic)
+```
+
+Tables of number Kids and vehicles
+========================================================
+```{r, eval=T}
+table(scf$kids[scf$nvehic==1])
+table(scf$kids[scf$nvehic==3])
+```
+
+Correlation
+========================================================
+```{r, eval=T}
+cor(scf$kids,scf$nvehic)
+```
+
+Scatter Plot
+========================================================
+```{r, eval=T}
+ggplot(data=scf,aes(x=kids,y=nvehic))+
+    geom_jitter(size=2)
+```
+  
+More Intuitive Scatter Plot
+========================================================
+```{r, eval=T,warning=F}
+ggplot(data=scf,aes(x=kids,y=nvehic))+
+    geom_jitter(stat = 'summary', fun.y = 'mean',size=5)
+```
+
+Line Graph
+========================================================
+```{r, eval=T,warning=F}
+ggplot(data=scf,aes(x=kids,y=nvehic))+
+    geom_line(stat = 'summary', fun.y = 'mean',size=2)
+```
+
+Cap Outliers
+========================================================
+```{r, eval=T}
+scf$nvehic[scf$nvehic>5]<-5
+scf$kids[scf$kids>4]<-4
+```
+
+Cap Outliers
+========================================================
+```{r, eval=T,warning=F}
+ggplot(data=scf,aes(x=kids,y=nvehic))+
+    geom_jitter(stat = 'summary', fun.y = 'mean',size=5)
+
+ggplot(data=scf,aes(x=kids,y=nvehic))+
+    geom_line(stat = 'summary', fun.y = 'mean',size=2)
+```
+
+Missing Data
+========================================================
+What does NA stand for?
+
+```{r, eval=T}
+summary(scf$saving)
+
+scf$with_saving <- scf$saving
+scf$with_saving[scf$with_saving == 0]<- NA
+
+```
+
+How NAs Cause Problems
+========================================================
+```{r, eval=T}
+mean(scf$with_saving)
+mean(scf$with_saving,na.rm = T)
+```
+    
+    
+    
+    
+    
+    
