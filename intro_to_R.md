@@ -27,10 +27,9 @@ Intro to R
 ========================================================
 autosize: true
 transition: fade
-  github: https://github.com/dmontagne
   
 
-Today we are going to cover the following topics:
+Agenda:
 ========================================================
 
 - R Basics
@@ -65,7 +64,7 @@ Some notes:
 - You can run a line where your cursor is blinking with ctrl-enter (Mac: command + enter)
 - You can run everything in a document by highlighting all lines and typing ctrl-enter (Mac: command + enter)
 
-Setting a work directory
+Setting a working directory
 ========================================================
 We need to tell R where to find our data and where to save our data. This is called our work directory.
 
@@ -79,7 +78,7 @@ getwd()
 [1] "/Users/dmontagne/Documents/GitHub/Data-Analytics-Teaching-Material"
 ```
 
-Setting a work directory
+Setting a working directory
 ========================================================
 On Apple:
 
@@ -92,7 +91,7 @@ When I paste this info into R. At first, I get:
 ```r
 /Users/dmontagne/Desktop/Data_analytics_Class_R files/data
 ```
-But I want to put that info into the *setwd* function. The path name should be in quotes, and all backslashes need to be forward slashes.
+But I want to put that info into the `setwd` function. The path name should be in quotes, and all backslashes need to be forward slashes.
 
 
 ```r
@@ -106,7 +105,7 @@ Reading the data into R
 ========================================================
 Now that we know where the data is, we will want to read it into R.
 
-The SFC file is a *sas7bdat* file. R  cannot natively read this file, but we can get tools to do this. The following function installs a package for reading this file:
+The SFC file is a `.dta` file. R  cannot natively read this file, but we can get tools to do this. The following function installs a package for reading this file:
 
 
 ```r
@@ -115,7 +114,7 @@ install.packages("haven")
 
 Reading the data into R
 ========================================================
-The *haven* package has a function for reading our dataset. Although we have it installed, whenever we want to use it, we need to tell R to load it. To do this, we will use the library function.
+The `haven` package has a function for reading our dataset. Although we have it installed, whenever we want to use it, we need to tell R to load it. To do this, we will use the library function.
 
 ```r
 library(haven)
@@ -123,18 +122,19 @@ library(haven)
 
 Reading the data into R
 ========================================================
-Finally, we can now read the dataset into R with *haven*'s *read_sas* function. Since we have already set our work directory, we just need to tell R the name of the file, and assign this dataset a name within R.
+Finally, we can now read the dataset into R with `haven`'s `read_dta` function. Since we have already set our work directory, we just need to tell R the name of the file, and assign this dataset a name within R.
 
 
 ```r
 scf <- read_dta("rscfp2016.dta")
 ```
 
+
 Let's take a quick break
 ========================================================
 We have now done something that we will want to be run every time we start class. We can save what we've written so far so that we never have to do the above steps again. Yay!
 
-If interested, you can manually browse the dataset with R's *View* function.
+If interested, you can manually browse the dataset with R's `View` function.
 
 
 ```r
@@ -189,7 +189,7 @@ head(scf)
 
 Browsing the data
 ========================================================
-It's even more convenient to look at just a few lines of a particular variable. Let's start with net worth. We will want to use R's dollar sign ($) syntax for referencing a variable within the scf dataset.
+It's even more convenient to look at just a few lines of a particular variable. Let's start with net worth. We will want to use R's dollar sign (`$`) syntax for referencing a variable within the scf dataset.
 
 
 ```r

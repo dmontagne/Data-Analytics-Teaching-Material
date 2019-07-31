@@ -787,13 +787,12 @@ hljs.initHighlightingOnLoad();
 <h1>Intro to R</h1><p></p>
 
 <div class="slideContent" >
-<p>github: <a href="https://github.com/dmontagne">https://github.com/dmontagne</a></p>
 
 </div>
 
 </section>
 <section data-transition="fade" data-transition-speed="default">
-<h3>Today we are going to cover the following topics:</h3>
+<h3>Agenda:</h3>
 <div class="slideContent" >
 <ul>
 <li>R Basics</li>
@@ -845,7 +844,7 @@ hljs.initHighlightingOnLoad();
 
 </section>
 <section data-transition="fade" data-transition-speed="default">
-<h3>Setting a work directory</h3>
+<h3>Setting a working directory</h3>
 <div class="slideContent" >
 <p>We need to tell R where to find our data and where to save our data. This is called our work directory.</p>
 
@@ -861,7 +860,7 @@ hljs.initHighlightingOnLoad();
 
 </section>
 <section data-transition="fade" data-transition-speed="default">
-<h3>Setting a work directory</h3>
+<h3>Setting a working directory</h3>
 <div class="mediaInline slideContent" >
 <p>On Apple:</p>
 
@@ -878,7 +877,7 @@ hljs.initHighlightingOnLoad();
 <pre><code class="r">/Users/dmontagne/Desktop/Data_analytics_Class_R files/data
 </code></pre>
 
-<p>But I want to put that info into the <em>setwd</em> function. The path name should be in quotes, and all backslashes need to be forward slashes.</p>
+<p>But I want to put that info into the <code>setwd</code> function. The path name should be in quotes, and all backslashes need to be forward slashes.</p>
 
 <pre><code class="r">setwd(&quot;~/Desktop/Data Analytics for Business/data&quot;)
 </code></pre>
@@ -891,7 +890,7 @@ hljs.initHighlightingOnLoad();
 <div class="slideContent" >
 <p>Now that we know where the data is, we will want to read it into R.</p>
 
-<p>The SFC file is a <em>sas7bdat</em> file. R  cannot natively read this file, but we can get tools to do this. The following function installs a package for reading this file:</p>
+<p>The SFC file is a <code>.dta</code> file. R  cannot natively read this file, but we can get tools to do this. The following function installs a package for reading this file:</p>
 
 <pre><code class="r">install.packages(&quot;haven&quot;)
 </code></pre>
@@ -902,7 +901,7 @@ hljs.initHighlightingOnLoad();
 <section data-transition="fade" data-transition-speed="default">
 <h3>Reading the data into R</h3>
 <div class="slideContent" >
-<p>The <em>haven</em> package has a function for reading our dataset. Although we have it installed, whenever we want to use it, we need to tell R to load it. To do this, we will use the library function.</p>
+<p>The <code>haven</code> package has a function for reading our dataset. Although we have it installed, whenever we want to use it, we need to tell R to load it. To do this, we will use the library function.</p>
 
 <pre><code class="r">library(haven)
 </code></pre>
@@ -913,7 +912,7 @@ hljs.initHighlightingOnLoad();
 <section data-transition="fade" data-transition-speed="default">
 <h3>Reading the data into R</h3>
 <div class="slideContent" >
-<p>Finally, we can now read the dataset into R with <em>haven</em>&#39;s <em>read_sas</em> function. Since we have already set our work directory, we just need to tell R the name of the file, and assign this dataset a name within R.</p>
+<p>Finally, we can now read the dataset into R with <code>haven</code>&#39;s <code>read_dta</code> function. Since we have already set our work directory, we just need to tell R the name of the file, and assign this dataset a name within R.</p>
 
 <pre><code class="r">scf &lt;- read_dta(&quot;rscfp2016.dta&quot;)
 </code></pre>
@@ -926,7 +925,7 @@ hljs.initHighlightingOnLoad();
 <div class="slideContent" >
 <p>We have now done something that we will want to be run every time we start class. We can save what we&#39;ve written so far so that we never have to do the above steps again. Yay!</p>
 
-<p>If interested, you can manually browse the dataset with R&#39;s <em>View</em> function.</p>
+<p>If interested, you can manually browse the dataset with R&#39;s <code>View</code> function.</p>
 
 <pre><code class="r">View(scf)
 </code></pre>
@@ -984,7 +983,7 @@ hljs.initHighlightingOnLoad();
 <section data-transition="fade" data-transition-speed="default">
 <h3>Browsing the data</h3>
 <div class="slideContent" >
-<p>It&#39;s even more convenient to look at just a few lines of a particular variable. Let&#39;s start with net worth. We will want to use R&#39;s dollar sign ($) syntax for referencing a variable within the scf dataset.</p>
+<p>It&#39;s even more convenient to look at just a few lines of a particular variable. Let&#39;s start with net worth. We will want to use R&#39;s dollar sign (<code>$</code>) syntax for referencing a variable within the scf dataset.</p>
 
 <pre><code class="r">head(scf$networth)
 </code></pre>

@@ -1,0 +1,337 @@
+<style>
+
+
+.reveal section p {
+  color: black;
+  font-size: .7em;
+  font-family: 'Helvetica'; #this is the font/color of text in slides
+}
+
+
+.section .reveal .state-background {
+    background: white;}
+.section .reveal h1,
+.section .reveal p {
+    color: black;
+    position: relative;
+    top: 4%;}
+
+
+.wrap-url pre code {
+  word-wrap:break-word;
+}
+
+</style>
+
+
+Non-linear Models
+========================================================
+autosize: true
+transition: fade
+  github: https://github.com/dmontagne
+
+
+Agenda
+========================================================
+- Social Network Analysis 
+- Cluster Analysis
+
+```{r, include=FALSE}
+knitr::opts_knit$set(root.dir = "~/Documents/GitHub/Data-Analytics-Teaching-Material/")
+```
+
+Prepare data
+========================================================
+Preparing data for network analysis requires a slightly different procedure than preparing data for linear modeling
+```{r, eval=T, include=T,message=F,warning=F}
+#a) set work directory
+    setwd("C:/Users/bda13/Desktop/Data Analytics for Business/scf2016")
+#b) install packages
+    list.of.packages <- c("ggplot2", "igraph","tm","topicmodels")
+    new.packages <- list.of.packages[!(list.of.packages %in% installed.packages()[,"Package"])]
+    if(length(new.packages)) install.packages(new.packages)
+```
+
+##2. Prepare data
+```{r, eval=T, include=T,message=F,warning=F}
+#c) load libraries
+    library(ggplot2)
+    library(igraph)
+    library(tm)
+    library(topicmodels)
+#d) read data
+    busdf <- readRDS("Durham_Bus.rds")
+    distdf <- readRDS("Durham_Dist.rds")
+    revdf<-readRDS("Durham_Rev.RDS")
+    simdf <- readRDS("Durham_Sim.rds")
+```
+
+##3. Get acquainted with the data
+![](C:/Users/bda13/Desktop/Data Analytics for Business/Class 10/map.png)
+
+##3.5 Get acquainted with the data
+```{r, eval=T}
+#a) Business info - first 10 columns of first 3 rows
+    busdf[1:3,1:10]
+```
+
+##4. Get acquainted with the data
+```{r, eval=T}
+#b) Similarity info - first 5 rows and columns
+    simdf[1:5,1:5]
+```
+
+##5. Look at similarity network
+```{r, eval=T, message=F}
+#a) assign as igraph object
+    g<-graph_from_adjacency_matrix(simdf,weighted = T,mode="undirected")
+#b) plot
+    par(mar=c(0,0,0,0)+.1)
+    set.seed(1); plot(g)
+```
+
+##6. Put restaurant names in plot
+```{r, eval=T, message=F,echo=F}
+  par(mar=c(0,0,0,0))
+  set.seed(1); plot(g,vertex.label=busdf$name,vertex.size=0,vertex.label.cex=.9)
+```
+
+##7. Centrality measures
+```{r, eval=T, message=F}
+  #create variables for eigenvector, betweenness, and closeness
+      busdf$ceig<-evcent(g)[[1]]
+      busdf$cbet<-betweenness(g)
+      busdf$close<-closeness(g)
+```
+
+##8. Closeness Centrality
+```{r, eval=T, message=F,echo=F}
+maxclose<-max(busdf$close)
+par(mar=c(0,0,0,0))
+set.seed(1); plot(g,vertex.label=busdf$name,vertex.size=busdf$close*1000,vertex.label.cex=.9)
+```
+
+##9. Eigenvector Centrality
+```{r, eval=T, message=F,echo=F}
+maxeig<-max(busdf$ceig)
+par(mar=c(0,0,0,0))
+set.seed(1); plot(g,vertex.label=busdf$name,vertex.size=busdf$ceig*15,vertex.label.cex=.9)
+```
+
+##10. Betweenness Centrality
+```{r, eval=T, message=F,echo=F}
+maxbet<-max(busdf$cbet)
+par(mar=c(0,0,0,0))
+set.seed(1); plot(g,vertex.label=busdf$name,vertex.size=busdf$cbet/10,vertex.label.cex=.9)
+```
+
+##11. Assortativity
+```{r, eval=T, message=F}
+assortativity(g,busdf$Price)
+assortativity(g,busdf$stars)
+assortativity(g,busdf$rev_count)
+```
+
+##11.5 Plotting Assortativity
+```{r, eval=T, message=F,echo=F}
+par(mar=c(0,0,0,0))
+set.seed(1); plot(g,vertex.label=busdf$name,vertex.label.cex=.9, vertex.color=busdf$Price)
+```
+
+
+##12. Transitivity and density
+```{r, eval=T, message=F}
+par(mar=c(0,0,0,0))
+edge_density(g)
+transitivity(g)
+```
+
+##12.25. For reference, old network
+```{r, eval=T, message=F, echo=F}
+par(mar=c(0,0,0,0))    
+plot(g,vertex.label=busdf$name,vertex.label.cex=.9,vertex.size=0)
+```
+
+
+##12.5. Example of lower density
+```{r, eval=T, message=F, echo=F}
+#3 - Delete 20 random ties
+    set.seed(2)
+    i=0
+    simdf2<-simdf
+    ties<-which(simdf2==1, arr.ind=T)
+    index1<-sample(1:nrow(ties),20)
+    remove<-ties[index1,]
+    for(i in 1:length(index1)){
+      simdf2[remove[i,1],remove[i,2]]<-0
+    }
+    # sum(simdf2)
+    g1<-graph_from_adjacency_matrix(simdf2,weighted = T,mode="undirected")
+    # edge_density(g1)
+    par(mar=c(0,0,0,0))
+    plot(g1,vertex.label=busdf$name,vertex.label.cex=.9,vertex.size=0)
+
+```
+
+
+##12.75. Example of same density but lower transitivity
+```{r, eval=T, message=F, echo=F}
+#2 - get count of transitive ties
+    transcount<-function(x){
+    for(j in 1:nrow(x)){ #for each individual in each camp
+        a<-x[j,]==1 #identify egos' ties   -   This grabs with indegree and outdegree
+        if(sum(a)==0){ #skip if ego has no ties
+          x[j,]<-0
+          next()
+        }
+        if(sum(a)==1){ #grab friends of ego's ties if ego has one tie
+          b<-x[a,]
+        }
+        if(sum(a)>1){ #grab all ties of ties if ego has more than one tie
+          b<-colSums(x[a,])
+        }
+        x[j,]<-ifelse(b>0,1,0) #assign these ties to ego
+
+    }
+      trans<-sum(x)
+      return(trans)
+    }
+#3 - replace 10 ties with random tie that reduces transitivity
+    set.seed(1)
+    i=0
+    simdf2<-simdf
+      while(i<10){
+        ties<-which(simdf2==1, arr.ind=T)
+        nonties<-which(simdf2==0, arr.ind=T)
+        index1<-sample(1:nrow(ties),1)
+        index2<-sample(1:nrow(nonties),1)
+        remove<-ties[index1,]
+        add<-nonties[index2,]
+        simdf3<-simdf2
+        simdf3[remove[1],remove[2]]<-0
+        simdf3[add[1],add[2]]<-1
+        if(transcount(simdf3)<transcount(simdf2)){
+          simdf2<-simdf3
+          i<-i+1
+        }
+      }
+    # sum(simdf)
+    # transcount(simdf2)
+    diag(simdf2)<-0
+    g1<-graph_from_adjacency_matrix(simdf2,weighted = T,mode="undirected")
+    # transitivity(g1)
+    par(mar=c(0,0,0,0))
+    plot(g1,vertex.label=busdf$name,vertex.label.cex=.9,vertex.size=0)
+```
+
+
+##13. Clustering
+There are tons of algorithms.
+```{r, eval=T, message=F}
+communities <- cluster_optimal(g)$membership
+communities
+modularity(g,communities)
+```
+
+##14. Plotting Clusters
+```{r, eval=T, message=F,echo=F}
+par(mar=c(0,0,0,0))
+set.seed(1);plot(g,vertex.label=busdf$name,vertex.color=communities,vertex.label.cex=.9)
+```
+
+##14.5. Plotting Clusters with Tons of Tweaks
+![](C:/Users/bda13/Desktop/Data Analytics for Business/Class 10/good model.png)
+
+##15. Clustering within restaurant categories
+Subset data to attributes we want to cluster on
+```{r, eval=T, message=F}
+names(busdf)[51:88]
+tempdf<-busdf[,c(51:88)]
+```
+
+##16. Run kmeans clustering into 6 clusters
+```{r, eval=T, message=F}
+set.seed(1); fit <- kmeans(tempdf, 6)
+```
+
+##17. Look at restaurants within the 5th cluster
+```{r, eval=T, message=F}
+busdf$name[fit$cluster==5]
+```
+
+##18. #What is the 5th cluster loading on?
+```{r, eval=T, message=F}
+#Find most distinct traits of 5th cluster
+    tempcenters<-colMeans(fit$centers)
+    temp5<-fit$centers[5,]-tempcenters
+#Show 3 most distinctve traits
+    sort(temp5,decreasing = T)[1:3]
+```
+
+##19. Heirarchical clustering
+Cluster just based on restaurant categories
+```{r, eval=T, message=F}
+#convert data to distance matrix
+    d <- dist(tempdf, method = "euclidean")
+#run cluster
+    fit <- hclust(d, method="ward.D") 
+```
+
+##20. Dendrogram
+```{r, eval=T, message=F,echo=F}
+fit$labels<-busdf$name
+par(mar=c(3,1,1,10)) 
+plot(as.dendrogram(fit),horiz=T)
+```
+
+##21. Clustering of reviews
+Review data example
+```{r, eval=T, message=F}
+revdf[[1]][1]
+```
+
+##22. Prep data for topic model 
+We need to clean up the data a ton for topic models to work. 
+- Run all cleaning steps under 5b
+```{r, eval=T, message=F}
+    #b) Prep data for topic model 
+        #a) Make data ASCII
+            text <- iconv(unlist(revdf), "latin1", "ASCII", sub="")
+        #b) Turn to corpus
+            rev_corpus <- Corpus(VectorSource(as.vector(text)))
+        #c) Remove punctuation
+            rev_corpus <- tm_map(rev_corpus, content_transformer(removePunctuation))
+        #d) lower case
+            rev_corpus <- tm_map(rev_corpus,  content_transformer(tolower))
+        #e) remove blanks
+            rev_corpus <- tm_map(rev_corpus , content_transformer(stripWhitespace))
+        #f) remove stop words
+            stoplist <- stopwords(kind = "en")
+            rev_corpus  <- tm_map(rev_corpus , content_transformer(removeWords), stoplist)
+        #g) remove stem words
+            rev_corpus  <- tm_map(rev_corpus , content_transformer(stemDocument), language = "english")
+        #h) create document term matrix
+            rev_DTM <- DocumentTermMatrix(rev_corpus, control = list(wordLengths = c(2, Inf)))
+        #i) remove sparse and common terms
+            DTM <- removeSparseTerms(rev_DTM , 0.99)
+        #j) Choose k
+            k<-20
+        #k) Set model parameters
+            control_LDA_Gibbs <- list(alpha = 50/k, estimate.beta = T,
+            verbose = 0, prefix = tempfile(), save = 0, keep = 50,
+            seed = 1, nstart = 1, best = T, delta = 0.1, iter = 500,
+            burnin = 50, thin = 500)
+        #l) Remove documents with no words
+            rowTotals <- apply(DTM , 1, sum)
+            DTM  <- DTM[rowTotals> 0, ]
+```
+
+##23. Run the topic model 
+```{r, eval=T, message=F}
+topic_model <- LDA(DTM, k, method = "Gibbs", control = control_LDA_Gibbs)
+```
+
+##24. Word clusters
+```{r, eval=T, message=F}
+terms(topic_model,10)[,1:5]
+```
