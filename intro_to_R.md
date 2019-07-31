@@ -27,6 +27,8 @@ Intro to R
 ========================================================
 autosize: true
 transition: fade
+
+follow along with code: https://dmontagne.github.io/Data-Analytics-Teaching-Material/intro_to_R_code.R 
   
 
 Agenda:
