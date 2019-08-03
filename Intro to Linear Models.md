@@ -28,7 +28,7 @@ Introduction to Linear Models
 ========================================================
 autosize: true
 transition: fade
-  github: https://github.com/dmontagne
+  follow along with code: https://dmontagne.github.io/Data-Analytics-Teaching-Material/intro_linear_models_code.R
 
 
 Agenda
