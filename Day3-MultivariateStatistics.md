@@ -28,7 +28,7 @@ Multivariate Statistics
 ========================================================
 autosize: true
 transition: fade
-  github: https://github.com/dmontagne
+  follow along with code: https://dmontagne.github.io/Data-Analytics-Teaching-Material/multivariate_stats_code.R 
   
 
 Agenda
