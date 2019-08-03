@@ -28,7 +28,7 @@ Basic Statistics in R
 ========================================================
 autosize: true
 transition: fade
-  github: https://github.com/dmontagne
+  Follow along with code: https://dmontagne.github.io/Data-Analytics-Teaching-Material/basic_stats_r_code.R 
   
 Agenda:
 ========================================================
