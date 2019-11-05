@@ -35,6 +35,155 @@ Agenda:
 - Visualize a social network
 - Build a topic model
 
+Install and Load Packages
+========================================================
+
+```{r, eval = F}
+install.packages("igraph")
+```
+
+```{r, message = F, warnings = F}
+library(igraph)
+library(dplyr)
+library(tidyverse)
+```
+
+Load in Data 
+========================================================
+- Data was collected through Spotify.com
+- All artists on Spotify's "Today's Top Hits" playlist, and those Spotify suggests as "Related Artists"
+
+Load in Data 
+========================================================
+
+```{r, message = F, warnings = F}
+download.file("https://github.com/dmontagne/Data-Analytics-Teaching-Material/blob/master/Music%20Network%20Data/artist_edges.Rda?raw=true", "git_edges")
+load("git_edges")
+
+download.file("https://github.com/dmontagne/Data-Analytics-Teaching-Material/blob/master/Music%20Network%20Data/vertices_info.Rda?raw=true", "git_vertices")
+load("git_vertices")
+
+```
+
+Make Network Object
+========================================================
+```{r, message = F, warnings = F}
+artist_network <- graph.data.frame(artist_edges[, -1], directed=F) # , vertices=vertices_info
+
+```
+
+
+Visualize Network 
+========================================================
+
+```{r, eval = F}
+# Let's plot our network
+plot(artist_network,
+     layout = layout.fruchterman.reingold(artist_network),
+     vertex.size = .5,
+     vertex.label = V(artist_network)$simple_labels)
+```
+
+Visualize Network 
+========================================================
+
+```{r, echo = F, warnings = F, message = F}
+plot(artist_network,
+     layout = layout.fruchterman.reingold(artist_network),
+     vertex.size = .5,
+     vertex.label = V(artist_network)$simple_labels)
+```
+
+Visualize Network 
+========================================================
+- That looked bad
+
+Visualize Network 
+========================================================
+- Let's filter by degree
+- Info we need:
+```{r,eval = F}
+degree(artist_network)
+V(artist_network)$name
+```
+
+Visualize Network 
+========================================================
+
+```{r}
+V(artist_network)$simple_labels <- ifelse(
+  # If an artist's degree is less than 20, don't give it a label (`NA`)
+  degree(artist_network) < 20, NA, 
+  # If an artist's degree is 20 or more, however, label it with the artist's
+  # name (stored in `V(artist_network)$name`)
+  V(artist_network)$name)
+```
+
+Visualize Network (again)
+========================================================
+
+```{r, eval = F}
+plot(artist_network,
+     layout = layout.fruchterman.reingold(artist_network),
+     vertex.size = 1,
+     vertex.label = V(artist_network)$simple_labels)
+```
+
+Visualize Network (again)
+========================================================
+
+```{r, echo = F}
+plot(artist_network,
+     layout = layout.fruchterman.reingold(artist_network),
+     vertex.size = 1,
+     vertex.label = V(artist_network)$simple_labels)
+```
+
+Individual Level Measures (vertices)
+========================================================
+
+```{r}
+betweenness(artist_network, v = V(artist_network), directed = F)
+closeness(artist_network, v = V(artist_network))
+```
+
+Network Level Measures
+========================================================
+
+```{r}
+edge_density(artist_network)
+transitivity(artist_network)
+```
+
+Clustering
+========================================================
+- There are many, many, many clustering algorithms
+- We are going to look at only one, edge betweenness based community structure
+     + The idea behind this algorithm is that it is likely that edges connecting separate modules have high edge betweenness as all the shortest paths from one module to another must traverse through them
+     + `cluster_edge_betweenness` performs this algorithm by calculating the edge betweenness of the graph, removing the edge with the highest edge betweenness score, then recalculating edge betweenness of the edges and again removing the one with the highest score, and so on
+    
+Clustering
+========================================================
+Perform Algorithm:
+```{r}
+artist_clusters <- cluster_edge_betweenness(artist_network)
+```
+
+Extract relevant information:
+```{r}
+artist_groups <- data.frame("artist" = artist_clusters$names, "group" = artist_clusters$membership)
+```
+
+Clustering
+========================================================
+- Now we should explore the groups!
+- Open the dataframe, and sort by `group`. Artists with the same number are part of the same cluster. 
+     + Do these groups make sense?
+     
+
+
+
+
 
 
 

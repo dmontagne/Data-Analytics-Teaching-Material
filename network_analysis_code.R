@@ -1,9 +1,15 @@
+
 library(igraph)
+library(dplyr)
+library(tidyverse)
 
 # Load in data 
 
-load("~/Documents/GitHub/Data-Analytics-Teaching-Material/Music Network Data/artist_edges.Rda")
-load("~/Documents/GitHub/Data-Analytics-Teaching-Material/Music Network Data/vertices_info.Rda")
+download.file("https://github.com/dmontagne/Data-Analytics-Teaching-Material/blob/master/Music%20Network%20Data/artist_edges.Rda?raw=true", "git_edges")
+load("git_edges")
+
+download.file("https://github.com/dmontagne/Data-Analytics-Teaching-Material/blob/master/Music%20Network%20Data/vertices_info.Rda?raw=true", "git_vertices")
+load("git_vertices")
 
 artist_network <- graph.data.frame(artist_edges[, -1], directed=F) # , vertices=vertices_info
 
@@ -15,7 +21,6 @@ plot(artist_network,
 
 # Right now it looks like a wall of text more than anything else.
 # How can we make this more readable?
-
 
 # Let's make a new variable in the igraph object that tells igraph to
 # only label those artists that are connected to 20 or more other artists.
@@ -57,7 +62,7 @@ plot(artist_network,
 V(artist_network)$popularity <- vertices_info$popularity
 V(artist_network)$transformed_popularity <- scale(vertices_info$popularity) + min(scale(vertices_info$popularity))*-1.5
 
-# Measures of the verteces
+# Measures of the vertices
 betweenness(artist_network, v = V(artist_network), directed = F)
 closeness(artist_network, v = V(artist_network))
 
@@ -66,8 +71,9 @@ edge_density(artist_network)
 transitivity(artist_network)
 
 # Clustering
-cluster_edge_betweenness(artist_network)
+artist_clusters <- cluster_edge_betweenness(artist_network)
+artist_groups <- data.frame("artist" = artist_clusters$names, "group" = artist_clusters$membership)
 
-
-
+artist_groups %>% 
+  mutate(group_num = paste("group", group))  
 
