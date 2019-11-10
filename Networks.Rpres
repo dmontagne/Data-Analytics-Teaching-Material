@@ -40,10 +40,12 @@ Install and Load Packages
 
 ```{r, eval = F}
 install.packages("igraph")
+install.packages("stm")
 ```
 
 ```{r, message = F, warnings = F}
 library(igraph)
+library(stm)
 library(dplyr)
 library(tidyverse)
 ```
@@ -180,10 +182,59 @@ Clustering
 - Open the dataframe, and sort by `group`. Artists with the same number are part of the same cluster. 
      + Do these groups make sense?
      
+Topic Modeling
+========================================================
 
+* Explain what topic modeling is here *
 
+Structural Topic Modeling
+========================================================
+- Various algorithms
 
+- Structural Topic Modeling allows for the implementation of _meta-data_
 
+Structural Topic Modeling
+========================================================
+Data: Lyrics from all* songs of artists that are in our network sample
+ + *there is some missing data on both songs and artists
 
+```{r, message = F, warnings = F}
+download.file("https://github.com/dmontagne/Data-Analytics-Teaching-Material/blob/master/lyrics_sample.Rda?raw=true", "git_lyrics")
+load("git_lyrics")
+```
+ 
+Structural Topic Modeling
+========================================================
+- This is a lot of data
+ + We have 71,553 songs, with around 403,348 unique words
+ + Too much to go through by hand and identify topics
+ + We will use the package `stm`
+ 
+Prep Data STM
+========================================================
+- We need to prepare our data to be in the right format for processing
+- Taking out "stopwords", remove punctuation, make everything lowercase
+- Making "document-term matrix"
+
+Prep Data STM
+========================================================
+- This takes a few minutes
+```{r}
+metadata_lyrics <- lyrics_sample %>% 
+  select(artist_id)
+process_lyrics <- textProcessor(lyrics_sample$lyrics, metadata = metadata_lyrics)
+prep_lyrics <- prepDocuments(process_lyrics$documents, process_lyrics$vocab, process_lyrics$meta)
+```
+
+Modeling STM
+========================================================
+- We have to choose how many topics to sort the data into
+- How?
+
+Modeling STM
+========================================================
+```{r}
+searchK()
+```
 
 

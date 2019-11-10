@@ -1,7 +1,11 @@
 
+install.packages("igraph")
+install.packages("stm")
+
 library(igraph)
 library(dplyr)
 library(tidyverse)
+library(stm)
 
 # Load in data 
 
@@ -10,6 +14,9 @@ load("git_edges")
 
 download.file("https://github.com/dmontagne/Data-Analytics-Teaching-Material/blob/master/Music%20Network%20Data/vertices_info.Rda?raw=true", "git_vertices")
 load("git_vertices")
+
+download.file("https://github.com/dmontagne/Data-Analytics-Teaching-Material/blob/master/Music%20Network%20Data/lyrics_sample.Rda?raw=true", "git_lyrics")
+load("git_lyrics")
 
 artist_network <- graph.data.frame(artist_edges[, -1], directed=F) # , vertices=vertices_info
 
@@ -76,4 +83,13 @@ artist_groups <- data.frame("artist" = artist_clusters$names, "group" = artist_c
 
 artist_groups %>% 
   mutate(group_num = paste("group", group))  
+
+# Topic Modeling
+
+
+
+
+
+
+
 
